@@ -16,13 +16,13 @@ Scene :: struct {
 
 load_obj :: proc(filepath: string) -> (triangle_arr: [dynamic]Triangle, ok: bool) {
 	data, err := os.read_entire_file(filepath, context.allocator)
+	defer delete(data, context.allocator)
 
 	triangles := make([dynamic]Triangle)
 
 	if err != nil {
 		return triangles, false
 	}
-	defer delete(data, context.allocator)
 
 	it := string(data)
 	for line in strings.split_lines_iterator(&it) {
