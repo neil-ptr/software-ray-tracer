@@ -1,8 +1,11 @@
 package main
 
-import "core:fmt"
-import scene "src/scene"
+import image "src/image"
+import ray_trace "src/ray_trace"
+import scn "src/scene"
+import vmath "src/vmath"
 import sdl "vendor:sdl3"
+
 
 main :: proc() {
 	width: i32 = 400
@@ -17,10 +20,16 @@ main :: proc() {
 	renderer := sdl.CreateSoftwareRenderer(surface)
 	defer sdl.DestroyRenderer(renderer)
 
-	triangles, ok := scene.load_obj("./objs/square.obj")
+	triangles, ok := scn.load_obj("./objs/square.obj")
 	if !ok {
 		panic("error loading obj file")
 	}
+
+	scene := scn.Scene{}
+	scene.camera = scn.Camera{vmath.Vec3{0, 0, 0}, vmath.Vec3{0, 0, 1}, width, height}
+
+	pixels := make([dynamic]u32, width * height)
+	frame_buffer := image.FrameBuffer{width, height, pixels}
 
 	done := false
 	for !done {
@@ -45,14 +54,16 @@ main :: proc() {
 			h = height,
 		}
 
-		sdl.BlitSurface(surface, &rect, sdl.GetWindowSurface(window), &rect)
+		ray_trace.render_frame(&scene, &frame_buffer)
 
-		i: i32 = 0
-		for i < width * height {
-			pixels := cast([^]u32)surface.pixels
-			pixels[i] = 0xff0000ff
-			i += 1
+		dst := make([dynamic]u32, width * height)
+		for i in 0 ..< int(width * height) {
+			dst[i] = frame_buffer.pixels[i]
 		}
+
+		surface.pixels = raw_data(dst)
+
+		sdl.BlitSurface(surface, &rect, sdl.GetWindowSurface(window), &rect)
 
 		sdl.UpdateWindowSurface(window)
 

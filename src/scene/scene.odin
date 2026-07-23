@@ -11,7 +11,7 @@ Triangle :: struct {
 
 Scene :: struct {
 	camera:    Camera,
-	triangles: []Triangle,
+	triangles: [dynamic]Triangle,
 }
 
 load_obj :: proc(filepath: string) -> (triangle_arr: [dynamic]Triangle, ok: bool) {
