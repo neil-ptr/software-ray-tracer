@@ -14,7 +14,11 @@ main :: proc() {
 	window := sdl.CreateWindow("ray tracer", width, height, sdl.WindowFlags{.RESIZABLE})
 	defer sdl.DestroyWindow(window)
 
-	surface := sdl.CreateSurface(width, height, .RGBA32)
+	render_pixels := make([dynamic]u32, width * height)
+	frame_buffer := image.FrameBuffer{width, height, render_pixels}
+
+	surface_pixels := make([dynamic]u32, width * height)
+	surface := sdl.CreateSurfaceFrom(width, height, .RGBA32, raw_data(surface_pixels), width * 4)
 	defer sdl.DestroySurface(surface)
 
 	renderer := sdl.CreateSoftwareRenderer(surface)
@@ -26,10 +30,15 @@ main :: proc() {
 	}
 
 	scene := scn.Scene{}
-	scene.camera = scn.Camera{vmath.Vec3{0, 0, 0}, vmath.Vec3{0, 0, 1}, width, height}
+	plane := scn.Plane{vmath.Vec3{1, 0, 0}, vmath.Vec3{0, 1, 0}}
+	scene.camera = scn.Camera {
+		position  = vmath.Vec3{0, 0, 0},
+		direction = vmath.Vec3{0, 0, 1},
+		width     = width,
+		height    = height,
+		canvas    = plane,
+	}
 
-	pixels := make([dynamic]u32, width * height)
-	frame_buffer := image.FrameBuffer{width, height, pixels}
 
 	done := false
 	for !done {
@@ -42,9 +51,38 @@ main :: proc() {
 			case .WINDOW_RESIZED:
 				width = event.window.data1
 				height = event.window.data2
+
+				delete(render_pixels)
+				render_pixels = make([dynamic]u32, width * height)
+				frame_buffer.width = width
+				frame_buffer.height = height
+				frame_buffer.pixels = render_pixels
+
+				delete(surface_pixels)
+				surface_pixels = make([dynamic]u32, width * height)
 				sdl.DestroySurface(surface)
-				surface = sdl.CreateSurface(width, height, .RGBA32)
+				surface = sdl.CreateSurfaceFrom(
+					width,
+					height,
+					.RGBA32,
+					raw_data(surface_pixels),
+					width * 4,
+				)
+
+				scene.camera = scn.Camera {
+					position  = vmath.Vec3{0, 0, 0},
+					direction = vmath.Vec3{0, 0, 1},
+					width     = width,
+					height    = height,
+					canvas    = plane,
+				}
 			}
+		}
+
+		ray_trace.render_frame(&scene, &frame_buffer)
+
+		for i in 0 ..< int(width * height) {
+			surface_pixels[i] = frame_buffer.pixels[i]
 		}
 
 		rect := sdl.Rect {
@@ -53,16 +91,6 @@ main :: proc() {
 			w = width,
 			h = height,
 		}
-
-		ray_trace.render_frame(&scene, &frame_buffer)
-
-		dst := make([dynamic]u32, width * height)
-		for i in 0 ..< int(width * height) {
-			dst[i] = frame_buffer.pixels[i]
-		}
-
-		surface.pixels = raw_data(dst)
-
 		sdl.BlitSurface(surface, &rect, sdl.GetWindowSurface(window), &rect)
 
 		sdl.UpdateWindowSurface(window)
