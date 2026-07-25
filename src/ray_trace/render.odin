@@ -9,6 +9,9 @@ import "core:fmt"
 @(private)
 INFINITY :: max(f32)
 
+@(private)
+EPSILON: f32 : 0.000001
+
 render_frame :: proc(scene: ^scn.Scene, frame_buffer: ^image.FrameBuffer) {
 	width := frame_buffer.width
 	height := frame_buffer.height

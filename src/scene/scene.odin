@@ -27,7 +27,7 @@ load_obj :: proc(filepath: string) -> (triangle_arr: [dynamic]geometry.Triangle,
 		if line[0] == '#' {continue}
 
 		line_components := strings.split(line, " ")
-		keyword: ObjFileKeyword = keyword_from_token(line_components[0])
+		keyword: geometry.ObjFileKeyword = geometry.keyword_from_token(line_components[0])
 		component1 := line_components[1]
 		component2 := line_components[2]
 		component3 := line_components[3]
