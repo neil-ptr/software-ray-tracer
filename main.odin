@@ -29,14 +29,24 @@ main :: proc() {
 		panic("error loading obj file")
 	}
 
-	scene := scn.Scene{}
-	plane := scn.Plane{vmath.Vec3{1, 0, 0}, vmath.Vec3{0, 1, 0}} // 1:1 aspect ratio
-	scene.camera = scn.Camera {
-		position  = vmath.Vec3{0, 0, 0},
-		direction = vmath.Vec3{0, 0, 1},
-		width     = width,
-		height    = height,
-		canvas    = plane,
+	normalized_width := f32(width) / f32(height)
+	normalized_height := f32(1.0)
+	if width > height {
+		normalized_width = f32(1.0)
+		normalized_height = f32(height) / f32(width)
+	}
+
+	scene := scn.Scene {
+		camera = scn.Camera {
+			position = vmath.Vec3{0, 0, 0},
+			direction = vmath.Vec3{0, 0, 1},
+			width = width,
+			height = height,
+			canvas = scn.Plane {
+				vmath.Vec3{normalized_width, 0, 0},
+				vmath.Vec3{0, normalized_height, 0},
+			},
+		},
 	}
 
 
@@ -69,12 +79,22 @@ main :: proc() {
 					width * 4,
 				)
 
+				normalized_width := f32(width) / f32(height)
+				normalized_height := f32(1.0)
+				if width > height {
+					normalized_width = f32(1.0)
+					normalized_height = f32(height) / f32(width)
+				}
+
 				scene.camera = scn.Camera {
 					position  = vmath.Vec3{0, 0, 0},
 					direction = vmath.Vec3{0, 0, 1},
 					width     = width,
 					height    = height,
-					canvas    = plane,
+					canvas    = scn.Plane {
+						vmath.Vec3{normalized_width, 0, 0},
+						vmath.Vec3{0, normalized_height, 0},
+					},
 				}
 			}
 		}
