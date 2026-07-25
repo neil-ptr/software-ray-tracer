@@ -1,5 +1,6 @@
 package ray_trace
 
+import geometry "../geometry"
 import image "../image"
 import scn "../scene"
 import vmath "../vmath"
@@ -36,10 +37,8 @@ render_frame :: proc(scene: ^scn.Scene, frame_buffer: ^image.FrameBuffer) {
 	}
 }
 
-intersect_ray_triangle :: proc(
-	position: vmath.Vec3,
-	ray_vec: vmath.Vec3,
-	triangle: scn.Triangle,
-) -> scn.Triangle {
-	return scn.Triangle{0, 0, 0}
+does_intersect :: proc(ray: vmath.Vec3, triangle: geometry.Triangle) -> bool {
+
+
+	return false
 }

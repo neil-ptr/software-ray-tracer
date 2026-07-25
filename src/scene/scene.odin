@@ -1,24 +1,21 @@
 package scene
 
+import geometry "../geometry/"
 import "core:fmt"
 import "core:os"
 import "core:strconv"
 import "core:strings"
 
-Triangle :: struct {
-	v0, v1, v2: f32,
-}
-
 Scene :: struct {
 	camera:    Camera,
-	triangles: [dynamic]Triangle,
+	triangles: [dynamic]geometry.Triangle,
 }
 
-load_obj :: proc(filepath: string) -> (triangle_arr: [dynamic]Triangle, ok: bool) {
+load_obj :: proc(filepath: string) -> (triangle_arr: [dynamic]geometry.Triangle, ok: bool) {
 	data, err := os.read_entire_file(filepath, context.allocator)
 	defer delete(data, context.allocator)
 
-	triangles := make([dynamic]Triangle)
+	triangles := make([dynamic]geometry.Triangle)
 
 	if err != nil {
 		return triangles, false
@@ -46,7 +43,7 @@ load_obj :: proc(filepath: string) -> (triangle_arr: [dynamic]Triangle, ok: bool
 			v2, v2_ok := strconv.parse_f32(component3)
 			if !v2_ok {return triangles, false}
 
-			append(&triangles, Triangle{v0, v1, v2})
+			append(&triangles, geometry.Triangle{v0, v1, v2})
 
 		case .Normal:
 			fmt.printfln("normal")
