@@ -88,7 +88,7 @@ main :: proc() {
 
 				scene.camera = scn.Camera {
 					position  = vmath.Vec3{0, 0, 0},
-					direction = vmath.Vec3{0, 0, 1},
+					direction = vmath.Vec3{0, 0, -1},
 					width     = width,
 					height    = height,
 					canvas    = scn.Plane {
