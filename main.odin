@@ -30,7 +30,7 @@ main :: proc() {
 	}
 
 	scene := scn.Scene{}
-	plane := scn.Plane{vmath.Vec3{1, 0, 0}, vmath.Vec3{0, 1, 0}}
+	plane := scn.Plane{vmath.Vec3{1, 0, 0}, vmath.Vec3{0, 1, 0}} // 1:1 aspect ratio
 	scene.camera = scn.Camera {
 		position  = vmath.Vec3{0, 0, 0},
 		direction = vmath.Vec3{0, 0, 1},
