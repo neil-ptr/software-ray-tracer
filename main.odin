@@ -25,6 +25,7 @@ main :: proc() {
 	defer sdl.DestroyRenderer(renderer)
 
 	triangles, ok := scn.load_obj("./objs/square.obj")
+	defer delete(triangles)
 	if !ok {
 		panic("error loading obj file")
 	}
@@ -37,6 +38,7 @@ main :: proc() {
 	}
 
 	scene := scn.Scene {
+		triangles = triangles,
 		camera = scn.Camera {
 			position = vmath.Vec3{0, 0, 0},
 			direction = vmath.Vec3{0, 0, 1},
