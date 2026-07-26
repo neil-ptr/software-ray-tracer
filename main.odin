@@ -1,5 +1,6 @@
 package main
 
+import "core:fmt"
 import image "src/image"
 import ray_trace "src/ray_trace"
 import scn "src/scene"
@@ -24,9 +25,10 @@ main :: proc() {
 	renderer := sdl.CreateSoftwareRenderer(surface)
 	defer sdl.DestroyRenderer(renderer)
 
-	triangles, ok := scn.load_obj("./objs/triangle.obj")
+	triangles, err := scn.load_obj("./objs/triangle.obj")
 	defer delete(triangles)
-	if !ok {
+	if err != .None {
+		fmt.println("parse error:", err)
 		panic("error loading obj file")
 	}
 
