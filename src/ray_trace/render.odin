@@ -4,7 +4,6 @@ import geometry "../geometry"
 import image "../image"
 import scn "../scene"
 import vmath "../vmath"
-import "core:fmt"
 import "core:math/linalg"
 
 @(private)
@@ -43,8 +42,6 @@ render_frame :: proc(scene: ^scn.Scene, frame_buffer: ^image.FrameBuffer) {
 		norm_primary_ray_vec := linalg.normalize(primary_ray_vec)
 
 		for triangle in scene.triangles {
-			distance := compute_distance(norm_primary_ray_vec, triangle)
-
 			intersection_vec, hit := intersect(
 				scene.camera.position,
 				norm_primary_ray_vec,
@@ -106,8 +103,4 @@ intersect :: proc(
 	}
 
 	return vmath.Vec3{t, u, v}, true
-}
-
-compute_distance :: proc(ray: vmath.Vec3, triangle: geometry.Triangle) -> f32 {
-	return 0.0
 }
