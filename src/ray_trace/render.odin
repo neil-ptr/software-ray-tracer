@@ -13,6 +13,9 @@ INFINITY :: max(f32)
 @(private)
 EPSILON: f32 : 0.000001
 
+@(private)
+Intersect :: vmath.Vec3
+
 render_frame :: proc(scene: ^scn.Scene, frame_buffer: ^image.FrameBuffer) {
 	width := frame_buffer.width
 	height := frame_buffer.height
@@ -42,7 +45,13 @@ render_frame :: proc(scene: ^scn.Scene, frame_buffer: ^image.FrameBuffer) {
 		for triangle in scene.triangles {
 			distance := compute_distance(norm_primary_ray_vec, triangle)
 
-			if does_intersect(scene.camera.position, norm_primary_ray_vec, triangle) {
+			intersection_vec, hit := intersect(
+				scene.camera.position,
+				norm_primary_ray_vec,
+				triangle,
+			)
+
+			if hit {
 				frame_buffer.pixels[px_idx] = 0xFF0000FF
 			} else {
 				frame_buffer.pixels[px_idx] = 0x000000FF
@@ -53,19 +62,21 @@ render_frame :: proc(scene: ^scn.Scene, frame_buffer: ^image.FrameBuffer) {
 
 // moller trumbore
 // https://www.scratchapixel.com/lessons/3d-basic-rendering/ray-tracing-rendering-a-triangle/moller-trumbore-ray-triangle-intersection.html
-does_intersect :: proc(
+intersect :: proc(
 	position_vec: vmath.Vec3,
 	ray_vec: vmath.Vec3,
 	triangle: geometry.Triangle,
-) -> bool {
+) -> (
+	intersection_vec: vmath.Vec3,
+	Hit: bool,
+) {
 	v0v1_vec := triangle.v1 - triangle.v0
 	v0v2_vec := triangle.v2 - triangle.v0
 	norm_triangle_vec := linalg.normalize(linalg.cross(v0v1_vec, v0v2_vec))
 
-	// short circut parallel
 	ray_triangle_dot_product := linalg.dot(ray_vec, norm_triangle_vec)
 	if ray_triangle_dot_product >= 0.0 || abs(ray_triangle_dot_product) < EPSILON {
-		return false
+		return vmath.Vec3{}, false
 	}
 
 	T := position_vec - triangle.v0
@@ -76,25 +87,25 @@ does_intersect :: proc(
 
 	u := inv_M_determinant * linalg.dot(P, T)
 	if u < 0.0 || u > 1.0 {
-		return false
+		return vmath.Vec3{}, false
 	}
 
 	v := inv_M_determinant * linalg.dot(Q, ray_vec)
 	if v < 0.0 || v > 1.0 {
-		return false
+		return vmath.Vec3{}, false
 	}
 
 
 	if u + v > 1 {
-		return false
+		return vmath.Vec3{}, false
 	}
 
 	t := inv_M_determinant * linalg.dot(Q, v0v2_vec)
 	if t <= 0.0 || abs(t) < EPSILON {
-		return false
+		return vmath.Vec3{}, false
 	}
 
-	return true
+	return vmath.Vec3{t, u, v}, true
 }
 
 compute_distance :: proc(ray: vmath.Vec3, triangle: geometry.Triangle) -> f32 {
