@@ -24,7 +24,7 @@ main :: proc() {
 	renderer := sdl.CreateSoftwareRenderer(surface)
 	defer sdl.DestroyRenderer(renderer)
 
-	triangles, ok := scn.load_obj("./objs/square.obj")
+	triangles, ok := scn.load_obj("./objs/triangle.obj")
 	defer delete(triangles)
 	if !ok {
 		panic("error loading obj file")
