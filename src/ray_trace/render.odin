@@ -49,7 +49,11 @@ render_frame :: proc(scene: ^scn.Scene, frame_buffer: ^image.FrameBuffer) {
 			)
 
 			if hit {
-				frame_buffer.pixels[px_idx] = 0xFF0000FF
+				r := u32(intersection_vec[1] * 255)
+				g := u32(intersection_vec[2] * 255)
+				b := u32((1 - intersection_vec[1] - intersection_vec[2]) * 255)
+
+				frame_buffer.pixels[px_idx] = (r << 24) | (g << 16) | (b << 8) | 0xff
 			} else {
 				frame_buffer.pixels[px_idx] = 0x000000FF
 			}
