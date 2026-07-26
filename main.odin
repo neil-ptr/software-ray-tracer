@@ -8,8 +8,8 @@ import sdl "vendor:sdl3"
 
 
 main :: proc() {
-	width: i32 = 400
-	height: i32 = 400
+	width: i32 = 256
+	height: i32 = 256
 
 	window := sdl.CreateWindow("ray tracer", width, height, sdl.WindowFlags{.RESIZABLE})
 	defer sdl.DestroyWindow(window)
@@ -41,7 +41,7 @@ main :: proc() {
 		triangles = triangles,
 		camera = scn.Camera {
 			position = vmath.Vec3{0, 0, 0},
-			direction = vmath.Vec3{0, 0, 1},
+			direction = vmath.Vec3{0, 0, -1},
 			width = width,
 			height = height,
 			canvas = scn.Plane {
@@ -104,7 +104,10 @@ main :: proc() {
 		ray_trace.render_frame(&scene, &frame_buffer)
 
 		for i in 0 ..< int(width * height) {
-			surface_pixels[i] = frame_buffer.pixels[i]
+			// macos is little endian, swap to big endian
+			// macos: 0xAABBGGRR -> 0xRRGGBBAA
+			be_rgba := sdl.Swap32BE(frame_buffer.pixels[i])
+			surface_pixels[i] = be_rgba
 		}
 
 		rect := sdl.Rect {
@@ -116,7 +119,6 @@ main :: proc() {
 		sdl.BlitSurface(surface, &rect, sdl.GetWindowSurface(window), &rect)
 
 		sdl.UpdateWindowSurface(window)
-
 	}
 
 	sdl.Quit()
