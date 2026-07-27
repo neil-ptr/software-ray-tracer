@@ -48,20 +48,30 @@ render_frame :: proc(scene: ^scn.Scene, frame_buffer: ^image.FrameBuffer) {
 
 		norm_primary_ray_vec := linalg.normalize(primary_ray_vec)
 
-		for triangle in scene.triangles {
+		nearest_triangle_hit_point_vec := vmath.Vec3{INFINITY, 0, 0}
+		nearest_triangle: ^geometry.Triangle = nil
+
+		for &triangle in scene.triangles {
 			intersection_vec, hit := intersect(
 				scene.camera.position,
 				norm_primary_ray_vec,
 				triangle,
 			)
 
-			if hit {
-				r := u32(intersection_vec[1] * 255)
-				g := u32(intersection_vec[2] * 255)
-				b := u32((1 - intersection_vec[1] - intersection_vec[2]) * 255)
-
-				frame_buffer.pixels[px_idx] = (r << 24) | (g << 16) | (b << 8) | 0xff
+			if hit && intersection_vec[0] < nearest_triangle_hit_point_vec[0] {
+				nearest_triangle_hit_point_vec = intersection_vec
+				nearest_triangle = &triangle
 			}
+		}
+
+		if nearest_triangle != nil {
+			r := u32(nearest_triangle_hit_point_vec[1] * 255)
+			g := u32(nearest_triangle_hit_point_vec[2] * 255)
+			b := u32(
+				(1 - nearest_triangle_hit_point_vec[1] - nearest_triangle_hit_point_vec[2]) * 255,
+			)
+
+			frame_buffer.pixels[px_idx] = (r << 24) | (g << 16) | (b << 8) | 0xff
 		}
 	}
 }
