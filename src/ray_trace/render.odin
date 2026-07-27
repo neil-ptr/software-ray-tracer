@@ -6,6 +6,7 @@ import scn "../scene"
 import vmath "../vmath"
 import "core:math/linalg"
 
+
 @(private)
 INFINITY :: max(f32)
 
@@ -15,9 +16,23 @@ EPSILON: f32 : 0.000001
 @(private)
 Intersect :: vmath.Vec3
 
+
+@(private)
+CLEARED_PIXEL: u32 = 0x000000FF
+
+@(private)
+clear_frame :: proc(frame_buffer: ^image.FrameBuffer) {
+	CLEARED_PIXEL: u32 = 0x000000FF
+	for i in 0 ..< int(frame_buffer.width * frame_buffer.height) {
+		frame_buffer.pixels[i] = CLEARED_PIXEL
+	}
+}
+
 render_frame :: proc(scene: ^scn.Scene, frame_buffer: ^image.FrameBuffer) {
 	width := frame_buffer.width
 	height := frame_buffer.height
+
+	clear_frame(frame_buffer)
 
 	assert(width > 0, "width is non-positive")
 	assert(height > 0, "height is non-positive")
@@ -54,8 +69,6 @@ render_frame :: proc(scene: ^scn.Scene, frame_buffer: ^image.FrameBuffer) {
 				b := u32((1 - intersection_vec[1] - intersection_vec[2]) * 255)
 
 				frame_buffer.pixels[px_idx] = (r << 24) | (g << 16) | (b << 8) | 0xff
-			} else {
-				frame_buffer.pixels[px_idx] = 0x000000FF
 			}
 		}
 	}
