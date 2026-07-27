@@ -32,10 +32,10 @@ render_frame :: proc(scene: ^scn.Scene, frame_buffer: ^image.FrameBuffer) {
 	width := frame_buffer.width
 	height := frame_buffer.height
 
-	clear_frame(frame_buffer)
-
 	assert(width > 0, "width is non-positive")
 	assert(height > 0, "height is non-positive")
+
+	clear_frame(frame_buffer)
 
 	for px_idx in 0 ..< width * height {
 		pixel_row_idx := px_idx % width
