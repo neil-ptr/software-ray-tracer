@@ -49,8 +49,7 @@ render_frame :: proc(scene: ^scn.Scene, frame_buffer: ^image.FrameBuffer) {
 		norm_primary_ray_vec := linalg.normalize(primary_ray_vec)
 
 		nearest_triangle_hit_point_vec := vmath.Vec3{INFINITY, 0, 0}
-		nearest_triangle: ^geometry.Triangle = nil
-
+		hit_found := false
 		for &triangle in scene.triangles {
 			intersection_vec, hit := intersect(
 				scene.camera.position,
@@ -60,11 +59,11 @@ render_frame :: proc(scene: ^scn.Scene, frame_buffer: ^image.FrameBuffer) {
 
 			if hit && intersection_vec[0] < nearest_triangle_hit_point_vec[0] {
 				nearest_triangle_hit_point_vec = intersection_vec
-				nearest_triangle = &triangle
+				hit_found = true
 			}
 		}
 
-		if nearest_triangle != nil {
+		if hit_found {
 			r := u32(nearest_triangle_hit_point_vec[1] * 255)
 			g := u32(nearest_triangle_hit_point_vec[2] * 255)
 			b := u32(
@@ -84,7 +83,7 @@ intersect :: proc(
 	triangle: geometry.Triangle,
 ) -> (
 	intersection_vec: vmath.Vec3,
-	Hit: bool,
+	hit: bool,
 ) {
 	v0v1_vec := triangle.v1 - triangle.v0
 	v0v2_vec := triangle.v2 - triangle.v0
