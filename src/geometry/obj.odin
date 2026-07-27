@@ -5,6 +5,7 @@ ObjFileKeyword :: enum {
 	Face,
 	Normal,
 	Invalid,
+	MaterialLib,
 }
 
 
@@ -16,6 +17,8 @@ keyword_from_token :: proc(keyword: string) -> ObjFileKeyword {
 		return .Face
 	case "vn":
 		return .Normal
+	case "mtllib":
+		return .MaterialLib
 	}
 	return .Invalid
 }

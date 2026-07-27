@@ -25,7 +25,7 @@ main :: proc() {
 	renderer := sdl.CreateSoftwareRenderer(surface)
 	defer sdl.DestroyRenderer(renderer)
 
-	triangles, err := scn.load_obj("./objs/square.obj")
+	triangles, err := scn.load_obj("./objs/sphere.obj")
 	defer delete(triangles)
 	if err != .None {
 		fmt.println("parse error:", err)

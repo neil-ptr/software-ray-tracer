@@ -81,12 +81,13 @@ load_obj :: proc(filepath: string) -> (triangle_arr: [dynamic]geometry.Triangle,
 
 		line_components := strings.split(line, " ")
 		keyword: geometry.ObjFileKeyword = geometry.keyword_from_token(line_components[0])
-		component1 := line_components[1]
-		component2 := line_components[2]
-		component3 := line_components[3]
 
 		switch keyword {
 		case .Vertex:
+			component1 := line_components[1]
+			component2 := line_components[2]
+			component3 := line_components[3]
+
 			x, x_ok := strconv.parse_f32(component1)
 			if !x_ok {return triangles, .InvalidVertexComponent}
 
@@ -99,8 +100,14 @@ load_obj :: proc(filepath: string) -> (triangle_arr: [dynamic]geometry.Triangle,
 			append(&vecs, vmath.Vec3{x, y, z})
 
 		case .Normal:
-			fmt.printfln("normal")
+			fmt.printfln("TODO: normal")
+		case .MaterialLib:
+			fmt.printfln("TODO: materiallib")
 		case .Face:
+			component1 := line_components[1]
+			component2 := line_components[2]
+			component3 := line_components[3]
+
 			vtn0, vtn0_ok := parse_face_component(component1)
 			if !vtn0_ok {
 				return triangles, .InvalidFaceComponent
