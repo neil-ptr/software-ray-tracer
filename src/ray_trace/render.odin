@@ -20,14 +20,6 @@ Intersect :: vmath.Vec3
 @(private)
 CLEARED_PIXEL: u32 = 0x000000FF
 
-@(private)
-clear_frame :: proc(frame_buffer: ^image.FrameBuffer) {
-	CLEARED_PIXEL: u32 = 0x000000FF
-	for i in 0 ..< int(frame_buffer.width * frame_buffer.height) {
-		frame_buffer.pixels[i] = CLEARED_PIXEL
-	}
-}
-
 render_frame :: proc(scene: ^scn.Scene, frame_buffer: ^image.FrameBuffer) {
 	width := frame_buffer.width
 	height := frame_buffer.height
@@ -35,7 +27,7 @@ render_frame :: proc(scene: ^scn.Scene, frame_buffer: ^image.FrameBuffer) {
 	assert(width > 0, "width is non-positive")
 	assert(height > 0, "height is non-positive")
 
-	clear_frame(frame_buffer)
+	image.clear_buffer(frame_buffer)
 
 	for px_idx in 0 ..< width * height {
 		pixel_row_idx := px_idx % width
