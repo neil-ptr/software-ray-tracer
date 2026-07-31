@@ -2,7 +2,6 @@ package scene
 
 import geometry "../geometry/"
 import vmath "../vmath"
-import "core:fmt"
 import "core:os"
 import "core:strconv"
 import "core:strings"
@@ -45,9 +44,12 @@ parse_face_component :: proc(component: string) -> (vtn: VertexTextureNormal, ok
 			return VertexTextureNormal{0, 0, 0}, false
 		}
 
-		texture_key, texture_key_ok := strconv.parse_int(parts[1])
-		if !texture_key_ok {
-			return VertexTextureNormal{0, 0, 0}, false
+		texture_key := -1
+		if len(parts[1]) > 0 {
+			parse_texture_key, texture_key_ok := strconv.parse_int(parts[1])
+			if !texture_key_ok {
+				return VertexTextureNormal{0, 0, 0}, false
+			}
 		}
 
 		normal_key, normal_key_ok := strconv.parse_int(parts[2])
@@ -58,7 +60,7 @@ parse_face_component :: proc(component: string) -> (vtn: VertexTextureNormal, ok
 		return VertexTextureNormal{vertex_key, texture_key, normal_key}, true
 
 	case:
-		return VertexTextureNormal{0, 0, 0}, false
+		return VertexTextureNormal{}, false
 	}
 }
 
@@ -99,10 +101,6 @@ load_obj :: proc(filepath: string) -> (triangle_arr: [dynamic]geometry.Triangle,
 
 			append(&vecs, vmath.Vec3{x, y, z})
 
-		case .Normal:
-			fmt.printfln("TODO: normal")
-		case .MaterialLib:
-			fmt.printfln("TODO: materiallib")
 		case .Face:
 			component1 := line_components[1]
 			component2 := line_components[2]
@@ -130,6 +128,8 @@ load_obj :: proc(filepath: string) -> (triangle_arr: [dynamic]geometry.Triangle,
 
 			append(&triangles, geometry.Triangle{v0, v1, v2})
 		case .Invalid:
+		case .Normal:
+		case .MaterialLib:
 		}
 	}
 
