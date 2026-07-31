@@ -270,7 +270,6 @@ paket-files/
 builds/
 bin/
 *.exe
-*.obj
 *.pdb
 *.res
 desktop.ini
